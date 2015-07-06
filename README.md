@@ -1,7 +1,7 @@
 # video-vectorization
 
 Python Code: 
-For the actual code, open [recontruction/code.py]
+For the actual code, open [vectorization/code.py]
 
 ##########
 ##Inputs##
