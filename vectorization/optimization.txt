@@ -1,0 +1,4 @@
+1) Find the type of cursor in a video by looking at 3 consecutive frames and save the cursor image. Look at all the possible cursor types in the video. Will also be helpful for processing unknown video.
+
+
+2) For cursor template matching stage, first look for the cursor within a small box in close vicinity to the cursor position in last frame. If the matching fails (below certain threshold), look in the complete frame
