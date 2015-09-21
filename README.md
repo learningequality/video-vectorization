@@ -29,5 +29,6 @@ Other output files are:
 ########
 
 Small Demo: http://icanmakemyownapp.com/ka_lite
+Updated Demo: icanmakemyownapp.com/ka_lite_updated/?id=1 
 
 
