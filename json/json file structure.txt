@@ -36,11 +36,10 @@
 }
 
 
-bounding box of objects
-
-//SCrollable images
-
-max min, bounding box of objects
-no commas
-no nested objects in cursor
-easel and paper.js
+///////////////////////////////////
+Comments about the JSON Structure// 
+bounding box of objects		 //
+max min, bounding box of objects //
+no commas			 //
+no nested objects in cursor	 //
+///////////////////////////////////
