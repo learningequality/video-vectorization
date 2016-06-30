@@ -69,3 +69,11 @@ Other output files are:
 3) file named 'background.png' contains the first frame of the video (We will augment this image once the scrolling function is written)
 4) file named 'cursor_positions.txt' contains cursor position for every single frame of the video
 5) file named 'object_list.txt' contains the bounding box, timestamp and color of every object detected in the first pass.
+
+### Optimizations
+1) Simple frame difference adds noise in the resulting image. Lossy codec distorts the pixel values. New Logic: Filter out any difference that is less than n (n = 20) on the grayscale [0-255].
+
+2) Find the type of cursor in a video by looking at 3 consecutive frames and save the cursor image. Look at all the possible cursor types in the video. Will also be helpful for processing unknown video.
+
+
+3) For cursor template matching stage, first look for the cursor within a small box in close vicinity to the cursor position in last frame. If the matching fails (below certain threshold), look in the complete frame
