@@ -1,10 +1,13 @@
 # Video Vectorization
 
 ## Running Vectorization Side
-Run vectorization.py script.
+1. Make sure you have Python, pip, and OpenCV installed.
+2. Create a Python virtual enviornment with something like [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/).
+3. Run `pip install requirements.txt`
+4. Run `python vectorization/vectorization.py`
 
 ## Viewing Rendering Side
-View index.html
+Open rendering/index.html in a browser.
 
 ### Sample JSON File
 
