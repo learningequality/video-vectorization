@@ -10,6 +10,7 @@
 
 ## Viewing Rendering Side
 Open rendering/index.html in a browser.
+[View a demo here.](https://rawgit.com/christianmemije/video-vectorization/master/rendering/index.html)
 
 ### Sample JSON File
 
