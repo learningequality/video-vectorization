@@ -11,9 +11,7 @@ from igraph import *
 import itertools
 import json
 
-##########
-##PART 1##
-##########
+# PART 1
 
 print 'part 1 started'
 
@@ -81,11 +79,12 @@ f_write_cursor_pos_for_order_points = open('cursor positions.txt', 'w')
 f_write_cursor_general = open('cursor_general.txt', 'w')
 
 cursor_pos_before_starting = []  # store as many as last 5 cursor positions
-saved_copy_of_cursor_pos_before_starting = []  # this stores a copy of cursor_pos_before_starting and uses that to write to data
+# this stores a copy of cursor_pos_before_starting and uses that to write to data
+saved_copy_of_cursor_pos_before_starting = []
 cursor_pos_for_ordering = []
 
 
-def getColor(image):
+def get_color(image):
     # ignore black color and get the median of red, green and blue
 
     threshold_black = 10
@@ -108,7 +107,7 @@ def getColor(image):
     return [np.percentile(np.array(reds), 90), np.percentile(np.array(greens), 90), np.percentile(np.array(blues), 90)]
 
 
-def RemoveMouse(gray_input):
+def remove_cursor(gray_input):
     # Remove the cursor
 
     # - Use gray image created above method = 'cv2.TM_CCOEFF'
@@ -129,7 +128,7 @@ def RemoveMouse(gray_input):
         cv2.rectangle(gray_input, top_left, bottom_right, (0, 0, 0), -1)
 
 
-def CurrentMouseLocation(gray_input, frame_number):
+def get_current_mouse_location(gray_input, frame_number):
     # Find the cursor
 
     # - Use gray image created above method = 'cv2.TM_CCOEFF'
@@ -191,7 +190,7 @@ while cap.isOpened():
 
         if current_frame > 0:
 
-            current_mouse_position = CurrentMouseLocation(gray, current_frame)
+            current_mouse_position = get_current_mouse_location(gray, current_frame)
 
             f_write_cursor_general.write(str(current_mouse_position[1]) + " " + str(current_mouse_position[2]) + ",")
             json_cursor_log.append([str(current_mouse_position[1]), str(current_mouse_position[2])])
@@ -224,7 +223,8 @@ while cap.isOpened():
                     index_of_starting_frame = current_frame
 
                     # Reset Cursor Positions
-                    cursor_pos_for_ordering = []  # - what about the last few cursor positions as well? if needed? - as in frame_before_starting_4,5
+                    # - what about the last few cursor positions as well? if needed? - as in frame_before_starting_4,5
+                    cursor_pos_for_ordering = []
                     saved_copy_of_cursor_pos_before_starting = list(cursor_pos_before_starting)
 
                     # - start saving the new object
@@ -248,7 +248,7 @@ while cap.isOpened():
                     # Get the new imge - update binary image
                     bounding_image = cv2.subtract(gray, StartingFrame)
 
-                    RemoveMouse(bounding_image)
+                    remove_cursor(bounding_image)
 
                     ret, binaryDifference = cv2.threshold(bounding_image, 50, 255, cv2.THRESH_BINARY)
 
@@ -281,7 +281,8 @@ while cap.isOpened():
 
                     # cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0),1)
 
-                    if x1 - 4 > 0 and x2 + 4 < imageWidth and y1 - 4 > 0 and y2 + 4 < imageHeight and x2 - x1 > 0 and y2 - y1 > 0:
+                    if x1 - 4 > 0 and x2 + 4 < imageWidth and y1 - 4 > 0 \
+                            and y2 + 4 < imageHeight and x2 - x1 > 0 and y2 - y1 > 0:
 
                         rect_start_x.append(x1 - 4)
                         rect_start_y.append(y1 - 4)
@@ -297,7 +298,7 @@ while cap.isOpened():
                         ROI = frame[y1 - 4:y2 + 4, x1 - 4:x2 + 4]
 
                         # Get Color of Object
-                        [r, g, b] = getColor(ROI)
+                        [r, g, b] = get_color(ROI)
                         r = int(r)
                         g = int(g)
                         b = int(b)
@@ -309,7 +310,8 @@ while cap.isOpened():
                             str(x1 - 4) + ' ' + str(y1 - 4) + ' ' + str(_starting_time) + ' ' + str(_time) + ' ' + str(
                                 r) + ' ' + str(g) + ' ' + str(b) + '\n')
 
-                        # Cursor positions before starting of the objects: in order to get the very starting points that are missing otherwise
+                        # Cursor positions before starting of the objects:
+                        # in order to get the very starting points that are missing otherwise
                         for i in saved_copy_of_cursor_pos_before_starting:
                             f_write_cursor_pos_for_order_points.write(
                                 str(i[0]) + " " + str(i[1] - (x1 - 4)) + " " + str(i[2] - (y1 - 4)) + ' ')
@@ -336,7 +338,8 @@ while cap.isOpened():
             frame_before_starting_2 = frame_before_starting_1
             frame_before_starting_1 = gray
 
-            # Storing the last few (5) cursor locations, since we seem to miss that information when we realize that new object has started
+            # Storing the last few (5) cursor locations,
+            # since we seem to miss that information when we realize that new object has started
             if len(cursor_pos_before_starting) < 5:
                 cursor_pos_before_starting.append(current_mouse_position)
             else:
@@ -377,9 +380,7 @@ cv2.destroyAllWindows()
 
 print 'part 1 ended'
 
-##########
-##PART 2##
-##########
+# PART 2
 
 print 'part 2 started'
 
@@ -418,14 +419,12 @@ cv2.destroyAllWindows()
 
 print 'Part 2 Completed!'
 
-##########
-##PART 3##
-##########
+# PART 3
 
 print 'part 3 started'
 
 
-def _thinningIteration(im, iter):
+def thinning_iterating(im, iter):
     I, M = im, np.zeros(im.shape, np.uint8)
     expr = """
     for (int i = 1; i < NI[0]-1; i++) {
@@ -456,14 +455,14 @@ def _thinningIteration(im, iter):
     return I & ~M
 
 
-def thinning(src):
+def thin(src):
     dst = src.copy() / 255
     prev = np.zeros(src.shape[:2], np.uint8)
     diff = None
 
     while True:
-        dst = _thinningIteration(dst, 0)
-        dst = _thinningIteration(dst, 1)
+        dst = thinning_iterating(dst, 0)
+        dst = thinning_iterating(dst, 1)
         diff = np.absolute(dst - prev)
         prev = dst.copy()
         if np.sum(diff) == 0:
@@ -472,7 +471,7 @@ def thinning(src):
     return dst * 255
 
 
-def IsNeighbourText(x, y, binary_threshold, img):
+def is_neighbor_text(x, y, binary_threshold, img):
     # return True # - just to show all cursor locations
     if img[y, x] > binary_threshold or (y + 1 < dim[1] and img[y + 1, x] > binary_threshold) or (
                         y - 1 >= 0 and img[y - 1, x] > binary_threshold) or (
@@ -487,13 +486,13 @@ def IsNeighbourText(x, y, binary_threshold, img):
         return False
 
 
-def FindClosestPoint(node, nodes):
+def find_closest_point(node, nodes):
     nodes = np.asarray(nodes)
     dist_2 = np.sum((nodes - node) ** 2, axis=1)
     return nodes[np.argmin(dist_2)]
 
 
-def ComputeAllEdges(data_pts):
+def compute_all_edges(data_pts):
     graph_connections = []
     for current in range(0, len(data_pts)):
         adjacent = [data_pts.index(_x) for _x in data_pts if
@@ -552,7 +551,7 @@ for object_number in range(0, total_objects):
         binary_threshold = 50
         ret, bw_img = cv2.threshold(gray_image, binary_threshold, 255, 0)
 
-        thinned_img = thinning(bw_img)
+        thinned_img = thin(bw_img)
         color_img = cv2.cvtColor(thinned_img, cv2.COLOR_GRAY2BGR)
 
         data_pts_thinned = np.nonzero(thinned_img)
@@ -563,7 +562,8 @@ for object_number in range(0, total_objects):
         count_valid_cursor_positions = 0
         # Append valid cursors in this local list
         valid_cursor_local = []
-        valid_cursor_to_global = []  # this list saves the unmapped, raw cursor positions so that the order of the objects can be figured out
+        # this list saves the unmapped, raw cursor positions so that the order of the objects can be figured out
+        valid_cursor_to_global = []
         for i in range(0, len(cursor_pos)):
             t = int(cursor_pos[i][0])
             x = int(cursor_pos[i][1])
@@ -579,11 +579,11 @@ for object_number in range(0, total_objects):
             dim = bw_img.shape[1::-1]
 
             # if a point is within the boundary box of the object
-            if y >= 0 and 0 <= x < dim[0] and y < dim[1]:
-                if IsNeighbourText(x, y, binary_threshold, bw_img) and len(data_pts_thinned) > 0 and (
+            if 0 <= x < dim[0] and 0 <= y < dim[1]:
+                if is_neighbor_text(x, y, binary_threshold, bw_img) and len(data_pts_thinned) > 0 and (
                             abs(x - last_x) + abs(y - last_y)) > 3:
                     # Map y, x to the closest point
-                    [mapped_x, mapped_y] = FindClosestPoint([y, x], data_pts_thinned)
+                    [mapped_x, mapped_y] = find_closest_point([y, x], data_pts_thinned)
                     # cv2.circle(color_img,(x, y), 1, (0,0,255))
                     color_img[mapped_x, mapped_y] = [255, 0, 0]
                     count_valid_cursor_positions += 1
@@ -597,7 +597,7 @@ for object_number in range(0, total_objects):
 
         # print count_valid_cursor_positions
 
-        # Get the thinning of the image
+        # Get the thin of the image
         # Map valid neighbour points as skeleton points: snap to closest
         # Show the resulting image
 
@@ -618,7 +618,7 @@ for object_number in range(0, total_objects):
         g.add_vertices(len(data_pts_thinned))
 
         # Create an adjacency matrix of data points - based on 8-connectivity
-        g.add_edges(ComputeAllEdges(data_pts_thinned))
+        g.add_edges(compute_all_edges(data_pts_thinned))
 
         g.vs["point"] = data_pts_thinned
 
@@ -639,8 +639,8 @@ for object_number in range(0, total_objects):
             else:
                 # Path exists
                 _path_between_strokes = []
-                for _path_points in shortest_path[
-                    0]:  # shortest path contains an array of shortest paths, meaning there could be more than one,
+                for _path_points in shortest_path[0]:
+                    # shortest path contains an array of shortest paths, meaning there could be more than one,
                     # I take the first one, doesn't make any difference
                     # color_img[g.vs[_path_points]['point']] = [0,0,0]
                     path_points.append(
@@ -705,8 +705,9 @@ for object_number in range(0, total_objects):
                                 path_points_ordered[_cursor_no].insert(0, missed_points[len(missed_points) - pt - 1][
                                     1])  # 1 is the actual data, #reversed order of points
                             else:
+                                # no points are there in path_points_ordered at all. So, add the first empty list
                                 path_points_ordered.append(
-                                    [])  # no points are there in path_points_ordered at all. So, add the first empty list
+                                    [])
 
         # Submit local ordered points to global variable
         path_points_ordered_global.append(path_points_ordered)
@@ -745,8 +746,8 @@ for object_number in range(0, total_objects):
 
         if counter == len(valid_cursors):
             break
-
-    '''#Write to output File
+    '''
+    #Write to output File
     f_output.write(objects[object_number] + '\n') # Object Information
     #f_output.write(str(len(path_points_ordered_global)) + '\n') # Number of Objects
 
@@ -760,11 +761,13 @@ for object_number in range(0, total_objects):
         for j in range(0, len(path_points_ordered_global[obj_number])):
                 if len(valid_cursor_timestamps_global) > obj_number + 1:
                         if len(valid_cursor_timestamps_global[obj_number]) > 1:
-                                output += str(valid_cursor_timestamps_global[obj_number][j + 1] - valid_cursor_timestamps_global[obj_number][j]) + ' ';
+                                output += str(valid_cursor_timestamps_global[obj_number][j + 1]
+                                              - valid_cursor_timestamps_global[obj_number][j]) + ' ';
                 else:
                         output += "1 "; #default: 1 frame time
                 for k in range(0, len(path_points_ordered_global[obj_number][j])):
-                        output += (str(path_points_ordered_global[obj_number][j][k][0]) + " " + str(path_points_ordered_global[obj_number][j][k][1]) + " ")
+                        output += (str(path_points_ordered_global[obj_number][j][k][0]) + " "
+                                   + str(path_points_ordered_global[obj_number][j][k][1]) + " ")
                 output += '\n'
 
         
@@ -790,7 +793,8 @@ for object_number in range(0, total_objects):
         for j in range(0, len(path_points_ordered_global[obj_number])):
             '''if len(valid_cursor_timestamps_global) > obj_number + 1:
                     if len(valid_cursor_timestamps_global[obj_number]) > 1:
-                            output += str(valid_cursor_timestamps_global[obj_number][j + 1] - valid_cursor_timestamps_global[obj_number][j]) + ' ';
+                            output += str(valid_cursor_timestamps_global[obj_number][j + 1]
+                                          - valid_cursor_timestamps_global[obj_number][j]) + ' ';
             else:
                     output += "1 "; #default: 1 frame time'''
             json_operation_strokes = []
@@ -813,15 +817,14 @@ f_output.close()
 cv2.destroyAllWindows()
 
 print 'part 3 ended'
-##########
-##PART 4##
-##########
+
+# PART 4
 
 print 'part 4 started'
 
 
 #
-def are_collinear(a, b, c):
+def check_if_collinear(a, b, c):
     diff = (((int(a[1]) - int(b[1])) * (int(a[0]) - int(c[0]))) - ((int(a[1]) - int(c[1])) * (int(a[0]) - int(b[0]))))
     return diff <= 1e-9
 
@@ -829,7 +832,7 @@ def are_collinear(a, b, c):
 def reduce_points(unreduced_list):
     new_list = unreduced_list[:]
     for point in range(len(unreduced_list) - 2):
-        if are_collinear(unreduced_list[point], unreduced_list[point + 1], unreduced_list[point + 2]):
+        if check_if_collinear(unreduced_list[point], unreduced_list[point + 1], unreduced_list[point + 2]):
             new_list[point + 1] = ''
     return new_list
 
@@ -860,7 +863,7 @@ for i in range(0, len(json_operation_log)):
         reduced_list = []
         for list_points in json_operation_log[i + 2]:
             reduced_list = reduce_points(list_points)
-        reduced_list = filter(None,reduced_list)
+        reduced_list = filter(None, reduced_list)
 
         myObject = {
             "offset_x": str(int(info[0])),
@@ -871,7 +874,6 @@ for i in range(0, len(json_operation_log)):
             "strokes": reduced_list
         }
         j_operations.append(myObject)
-
 
 jsonObject = {
     "filename": j_filename,
