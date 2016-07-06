@@ -3,10 +3,11 @@
 ## Running Vectorization Side
 ### Recommended Setup
 1. Make sure you have Python 2.7 and pip installed.
-2. Create a Python virtual enviornment with something like [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/).
-3. Install OpenCV 2 by follwing [this guide](https://medium.com/@manuganji/installation-of-opencv-numpy-scipy-inside-a-virtualenv-bf4d82220313#.m6i6da6er) to make sure it works with your virtual enviornment.
-3. Run `pip install requirements.txt`
-4. Run `python vectorization/vectorization.py`
+2. Create a Python virtual environment with something like [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/).
+3. Install OpenCV 2 by follwing [this guide](https://medium.com/@manuganji/installation-of-opencv-numpy-scipy-inside-a-virtualenv-bf4d82220313#.m6i6da6er) to make sure it works with your virtual environment.
+3. Install dependencies by running `pip install requirements.txt`
+4. Enter vectorization folder by running `cd vectorization/ `
+4. Run `python vectorization.py`
 
 ## Viewing Rendering Side
 Open rendering/index.html in a browser.
