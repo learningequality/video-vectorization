@@ -43,10 +43,9 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-#IDEA file
+# Custom Files
 .idea
-
-# Vectorization debugging files
+*.pyc
 /vectorization/atomic objects/
 /vectorization/background.png
 /vectorization/complete_strokes.txt
@@ -56,3 +55,4 @@ fabric.properties
 /vectorization/object_list.txt
 /vectorization/output.avi
 /vectorization/objects/
+/vectorization/test.txt

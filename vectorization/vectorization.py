@@ -819,11 +819,9 @@ cv2.destroyAllWindows()
 print 'part 3 ended'
 
 # PART 4
-
 print 'part 4 started'
 
 
-#
 def check_if_collinear(a, b, c):
     diff = (((int(a[1]) - int(b[1])) * (int(a[0]) - int(c[0]))) - ((int(a[1]) - int(c[1])) * (int(a[0]) - int(b[0]))))
     return diff <= 1e-9
@@ -837,64 +835,58 @@ def reduce_points(unreduced_list):
     return new_list
 
 
-# - Create a JSON File
+def generate_json():
+    global json
+    # - Create a JSON File
+    j_filename = input_video
+    j_interpolation = "interpolation"
+    j_cursor_type = cursor_filename
+    j_cursor_offset = [str(int(templateMouse_w / 2)), str(int(templateMouse_h / 2))]
+    j_duration = str(TotalFrames / FPS)
+    j_audio_file = "compressed_xyz.mp3"
+    j_background_image = background_image
+    j_frames_per_second = str(FPS)
+    j_cursor = json_cursor_log
+    # - go one level deeper in operation
+    j_operations = []
+    for i in range(0, len(json_operation_log)):
 
-j_filename = input_video
-j_interpolation = "interpolation"
-j_cursor_type = cursor_filename
-j_cursor_offset = [str(int(templateMouse_w / 2)), str(int(templateMouse_h / 2))]
-j_duration = str(TotalFrames / FPS)
-j_audio_file = "compressed_xyz.mp3"
-j_background_image = background_image
-j_frames_per_second = str(FPS)
+        if i % 3 is 0:  # every third element
+            info = json_operation_log[i].split(" ")
+            info = map(float, info)
 
-j_cursor = json_cursor_log
+            reduced_list = []
+            for list_points in json_operation_log[i + 2]:
+                reduced_list = reduce_points(list_points)
+            reduced_list = filter(None, reduced_list)
 
-# - go one level deeper in operation
+            myObject = {
+                "offset_x": str(int(info[0])),
+                "offset_y": str(int(info[1])),
+                "start": str(info[2]),
+                "end": str(info[3]),
+                "color": [str(int(info[4])), str(int(info[5])), str(int(info[6]))],
+                "strokes": reduced_list
+            }
+            j_operations.append(myObject)
+    jsonObject = {
+        "filename": j_filename,
+        "interpolation": j_interpolation,
+        "cursor_type": j_cursor_type,
+        "cursor_offset": j_cursor_offset,
+        "total_time": j_duration,
+        "audio_file": j_audio_file,
+        "background_image": j_background_image,
+        "frames_per_second": j_frames_per_second,
+        "cursor": j_cursor,
+        "operations": j_operations
+    }
+    json = json.dumps(jsonObject)
+    # - Write JSON to file
+    f_json = open('json.txt', 'w')
+    f_json.write(json)
+    f_json.close()
+    print 'part 4 done'
 
-j_operations = []
 
-for i in range(0, len(json_operation_log)):
-
-    if i % 3 is 0:  # every third element
-        info = json_operation_log[i].split(" ")
-        info = map(float, info)
-
-        reduced_list = []
-        for list_points in json_operation_log[i + 2]:
-            reduced_list = reduce_points(list_points)
-        reduced_list = filter(None, reduced_list)
-
-        myObject = {
-            "offset_x": str(int(info[0])),
-            "offset_y": str(int(info[1])),
-            "start": str(info[2]),
-            "end": str(info[3]),
-            "color": [str(int(info[4])), str(int(info[5])), str(int(info[6]))],
-            "strokes": reduced_list
-        }
-        j_operations.append(myObject)
-
-jsonObject = {
-    "filename": j_filename,
-    "interpolation": j_interpolation,
-    "cursor_type": j_cursor_type,
-    "cursor_offset": j_cursor_offset,
-    "total_time": j_duration,
-    "audio_file": j_audio_file,
-    "background_image": j_background_image,
-    "frames_per_second": j_frames_per_second,
-    "cursor": j_cursor,
-    "operations": j_operations
-}
-
-json = json.dumps(jsonObject)
-
-# - Write JSON to file
-f_json = open('json.txt', 'w')
-
-f_json.write(json)
-
-f_json.close()
-
-print 'part 4 done'
+generate_json()
