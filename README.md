@@ -9,6 +9,21 @@
 4. Enter vectorization folder by running `cd vectorization/ `
 4. Run `python vectorization.py`
 
+Ubuntu 14.04
+Did not work on 16.*
+sudo add-apt-repository ppa:graphics-drivers/ppa
+sudo apt-get update
+Restart and select latest driver from the additonal drivers manager.
+https://developer.nvidia.com/cuda-downloads
+http://developer.download.nvidia.com/compute/cuda/7.5/Prod/docs/sidebar/CUDA_Quick_Start_Guide.pdf
+run bash test.sh to check it cuda is installed
+nvcc test.cu and run a.out
+
+cmake -D MAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=$VIRTUAL_ENV/local/ -D PYTHON_EXECUTABLE=$VIRTUAL_ENV/bin/python -D PYTHON_PACKAGES_PATH=$VIRTUAL_ENV/lib/python2.7/site-packages ..\
+
+
+Make sure ou have libxml2-dev installed
+
 ## Viewing Rendering Side
 Open rendering/index.html in a browser.
 [View a demo here.](https://rawgit.com/christianmemije/video-vectorization/master/rendering/index.html)
