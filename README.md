@@ -1,9 +1,29 @@
 # Video Vectorization
 
 ## Running Vectorization Side
-### Recommended Setup
+
+### Setup
+* OS: Ubuntu 14.04
+* Video Card: NVIDIA 980 ti
+
+### Basic Dependencies.
+* Python 2.7
+* pip
+
+#### Install drivers.
+* Add NVIDIA drivers PPA `sudo add-apt-repository ppa:graphics-drivers/ppa` and install the appropritate one, currently version 367.27.
+* Install the [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) by following the [CUDA Quick Start Guide](http://developer.download.nvidia.com/compute/cuda/7.5/Prod/docs/sidebar/CUDA_Quick_Start_Guide.pdf). TLDR:
+    1. Install the the CUDA toolkit by using the debian installer.
+    2. Reboot.
+    3. Modify the PATH and LD_LIBRARY_PATH BY running the following commands:
+        * `export PATH=/usr/local/cuda-7.5/bin:$PATH`
+        * `export LD_LIBRARY_PATH=/usr/local/cuda-7.5/lib64:$LD_LIBRARY_PATH`
+    4. Test that the everything is installed correctly by running this [test script]().
+#### Install OpenCV
+
+
 1. Make sure you have Python 2.7 and pip installed.
-2. Create a Python virtual environment with something like [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/).
+
 3. Install OpenCV 2 by follwing [this guide](https://medium.com/@manuganji/installation-of-opencv-numpy-scipy-inside-a-virtualenv-bf4d82220313#.m6i6da6er) to make sure it works with your virtual environment.
 3. Install dependencies by running `pip install requirements.txt`
 4. Enter vectorization folder by running `cd vectorization/ `
