@@ -18,10 +18,9 @@
     3. Modify the PATH and LD_LIBRARY_PATH BY running the following commands:
         * `export PATH=/usr/local/cuda-7.5/bin:$PATH`
         * `export LD_LIBRARY_PATH=/usr/local/cuda-7.5/lib64:$LD_LIBRARY_PATH`
-    4. Test that the everything is installed correctly by running this [compliling an example(http://docs.nvidia.com/cuda/cuda-getting-started-guide-for-linux/#compiling-examples).
+    4. Test that the everything installed correctly by [compliling an example](http://docs.nvidia.com/cuda/cuda-getting-started-guide-for-linux/#compiling-examples).
 
 ### Install OpenCV
-Installing
 * Install OpenCV 2 by follwing [this guide](https://medium.com/@manuganji/installation-of-opencv-numpy-scipy-inside-a-virtualenv-bf4d82220313) to make sure it works with your virtual python environment. TLDR:
     * Create a new virtual env.
     * Install numpy and scipy `pip install numpy scipy`
@@ -38,7 +37,7 @@ Installing
         * `import cv2`
         * 
 ### Install Project Dependencies    
-* Install dependencies by running `pip install requirements.txt`4. 
+* Install dependencies by running `pip install -r requirements.txt`
  
 ### Run vectroization code
 * Enter vectorization folder `cd vectorization/ `
