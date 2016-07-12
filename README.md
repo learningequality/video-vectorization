@@ -10,7 +10,7 @@
 * Python 2.7
 * pip
 
-#### Install drivers.
+### Install drivers.
 * Add NVIDIA drivers PPA `sudo add-apt-repository ppa:graphics-drivers/ppa` and install the appropritate one, currently version 367.27.
 * Install the [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) by following the [CUDA Quick Start Guide](http://developer.download.nvidia.com/compute/cuda/7.5/Prod/docs/sidebar/CUDA_Quick_Start_Guide.pdf). TLDR:
     1. Install the the CUDA toolkit by using the debian installer.
@@ -18,31 +18,31 @@
     3. Modify the PATH and LD_LIBRARY_PATH BY running the following commands:
         * `export PATH=/usr/local/cuda-7.5/bin:$PATH`
         * `export LD_LIBRARY_PATH=/usr/local/cuda-7.5/lib64:$LD_LIBRARY_PATH`
-    4. Test that the everything is installed correctly by running this [test script]().
-#### Install OpenCV
+    4. Test that the everything is installed correctly by running this [compliling an example(http://docs.nvidia.com/cuda/cuda-getting-started-guide-for-linux/#compiling-examples).
 
-
-1. Make sure you have Python 2.7 and pip installed.
-
-3. Install OpenCV 2 by follwing [this guide](https://medium.com/@manuganji/installation-of-opencv-numpy-scipy-inside-a-virtualenv-bf4d82220313#.m6i6da6er) to make sure it works with your virtual environment.
-3. Install dependencies by running `pip install requirements.txt`
-4. Enter vectorization folder by running `cd vectorization/ `
-4. Run `python vectorization.py`
-
-Ubuntu 14.04
-Did not work on 16.*
-sudo add-apt-repository ppa:graphics-drivers/ppa
-sudo apt-get update
-Restart and select latest driver from the additonal drivers manager.
-https://developer.nvidia.com/cuda-downloads
-http://developer.download.nvidia.com/compute/cuda/7.5/Prod/docs/sidebar/CUDA_Quick_Start_Guide.pdf
-run bash test.sh to check it cuda is installed
-nvcc test.cu and run a.out
-
-cmake -D MAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=$VIRTUAL_ENV/local/ -D PYTHON_EXECUTABLE=$VIRTUAL_ENV/bin/python -D PYTHON_PACKAGES_PATH=$VIRTUAL_ENV/lib/python2.7/site-packages ..\
-
-
-Make sure ou have libxml2-dev installed
+### Install OpenCV
+Installing
+* Install OpenCV 2 by follwing [this guide](https://medium.com/@manuganji/installation-of-opencv-numpy-scipy-inside-a-virtualenv-bf4d82220313) to make sure it works with your virtual python environment. TLDR:
+    * Create a new virtual env.
+    * Install numpy and scipy `pip install numpy scipy`
+    * Install [OpenCV dependencies](http://docs.opencv.org/2.4/doc/tutorials/introduction/linux_install/linux_install.html)
+    * Install the libxml2-dev pakcage `sudo apt-get install libxml2-dev`
+    * [Download the latest OpenCV 2.*](https://sourceforge.net/projects/opencvlibrary/files/opencv-unix/)
+    * Unzip the zip and cd into the directory. Then create a directory `release` and cd into it.
+    * Make sure you are working on your virtual env before running the following command. 
+        * `cmake -D MAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=$VIRTUAL_ENV/local/ -D PYTHON_EXECUTABLE=$VIRTUAL_ENV/bin/python -D PYTHON_PACKAGES_PATH=$VIRTUAL_ENV/lib/python2.7/site-packages ..\`
+    * Run `make -j8`
+    * Run `make install`
+    * Test that OpenCV is working by entering the python shell and importing OpenCV
+        * `python`
+        * `import cv2`
+        * 
+### Install Project Dependencies    
+* Install dependencies by running `pip install requirements.txt`4. 
+ 
+### Run vectroization code
+* Enter vectorization folder `cd vectorization/ `
+* Run `python vectorization.py`
 
 ## Viewing Rendering Side
 Open rendering/index.html in a browser.
