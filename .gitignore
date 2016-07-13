@@ -46,6 +46,7 @@ fabric.properties
 # Custom Files
 .idea
 *.pyc
+*~
 /vectorization/atomic objects/
 /vectorization/background.png
 /vectorization/complete_strokes.txt
