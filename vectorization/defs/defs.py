@@ -1,5 +1,4 @@
 # coding=utf-8
-from __future__ import print_function
 import itertools
 import json
 import cv2
@@ -175,6 +174,7 @@ def reduce_points(unreduced_list):
 
 def generate_json(input_video, cursor_filename, template_mouse_w, template_mouse_h, total_frames, fps,
                   background_image, json_cursor_log, json_operation_log):
+
     # - Create a JSON File
     j_filename = input_video
     j_interpolation = "interpolation"
@@ -229,4 +229,3 @@ def generate_json(input_video, cursor_filename, template_mouse_w, template_mouse
     f_json = open('json.txt', 'w')
     f_json.write(json_data)
     f_json.close()
-    print('part 4 done')
