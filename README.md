@@ -11,17 +11,17 @@
 * pip
 
 ### Install drivers.
-* Add NVIDIA drivers PPA `sudo add-apt-repository ppa:graphics-drivers/ppa` and install the appropritate one, currently version 367.27.
+* Add NVIDIA drivers PPA `sudo add-apt-repository ppa:graphics-drivers/ppa` and install the appropriate one, currently version 367.27.
 * Install the [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) by following the [CUDA Quick Start Guide](http://developer.download.nvidia.com/compute/cuda/7.5/Prod/docs/sidebar/CUDA_Quick_Start_Guide.pdf). TLDR:
     1. Install the the CUDA toolkit by using the debian installer.
     2. Reboot.
     3. Modify the PATH and LD_LIBRARY_PATH BY running the following commands:
         * `export PATH=/usr/local/cuda-7.5/bin:$PATH`
         * `export LD_LIBRARY_PATH=/usr/local/cuda-7.5/lib64:$LD_LIBRARY_PATH`
-    4. Test that the everything installed correctly by [compliling an example](http://docs.nvidia.com/cuda/cuda-getting-started-guide-for-linux/#compiling-examples).
+    4. Test that the everything installed correctly by [compiling an example](http://docs.nvidia.com/cuda/cuda-getting-started-guide-for-linux/#compiling-examples).
 
 ### Install OpenCV
-* Install OpenCV 2 by follwing [this guide](https://medium.com/@manuganji/installation-of-opencv-numpy-scipy-inside-a-virtualenv-bf4d82220313) to make sure it works with your virtual python environment. TLDR:
+* Install OpenCV 2 by following [this guide](https://medium.com/@manuganji/installation-of-opencv-numpy-scipy-inside-a-virtualenv-bf4d82220313) to make sure it works with your virtual python environment. TLDR:
     * Create a new virtual env.
     * Install numpy and scipy `pip install numpy scipy`
     * Install [OpenCV dependencies](http://docs.opencv.org/2.4/doc/tutorials/introduction/linux_install/linux_install.html)
@@ -39,7 +39,7 @@
 ### Install Project Dependencies    
 * Install dependencies by running `pip install -r requirements.txt`
  
-### Run vectroization code
+### Run vectorization code
 * Enter vectorization folder `cd vectorization/ `
 * Run `python vectorization.py`
 
