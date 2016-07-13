@@ -19,7 +19,7 @@ class ExtractFrames(luigi.Task):
 
 class IdentifyCursor(luigi.Task):
     def requires(self):
-        return [ExtractFrames]
+        return [ExtractFrames()]
 
     def output(self):
         return luigi.LocalTarget('test.txt')
