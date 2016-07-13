@@ -144,8 +144,8 @@ def compute_all_edges(data_pts):
 
     for current in range(0, len(data_pts)):
         adjacent = [data_pts.index(_x) for _x in data_pts if
-                    (abs(_x[0] - data_pts[current][0]) < 2) and (abs(_x[1] - data_pts[current][1]) < 2)
-                    and (_x[0] != data_pts[current][0] or _x[1] != data_pts[current][1])]
+                    (abs(_x[0] - data_pts[current][0]) < 2) and (abs(_x[1] - data_pts[current][1]) < 2) and
+                    (_x[0] != data_pts[current][0] or _x[1] != data_pts[current][1])]
         for _a in adjacent:
             graph_connections.append((current, _a))
             # print "connection: " + str(current) + " : " + str(_a)
