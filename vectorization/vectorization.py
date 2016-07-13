@@ -2,7 +2,7 @@
 from __future__ import print_function
 from defs import *
 
-input_video = 'input.mp4'
+input_video = 'exponents.mp4'
 cursor_filename = 'cursor_1.png'
 background_image = "background.png"
 
