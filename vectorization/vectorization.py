@@ -16,9 +16,10 @@ fps = None
 
 # PART 1
 print('part 1 started')
-count_objects_for_saving_images, json_operation_log, json_cursor_log, templateMouse_w, templateMouse_h, total_frames, \
-fps = part_one(input_video, cursor_filename, background_image, count_objects_for_saving_images, json_operation_log,
-               json_cursor_log, templateMouse_w, templateMouse_h, total_frames, fps)
+count_objects_for_saving_images, json_operation_log, json_cursor_log, templateMouse_w, templateMouse_h, total_frames, fps = part_one(
+    input_video, cursor_filename, background_image,
+    count_objects_for_saving_images, json_operation_log, json_cursor_log,
+    templateMouse_w, templateMouse_h, total_frames, fps)
 print('part 1 ended')
 
 # PART 2
@@ -33,6 +34,7 @@ print('part 3 ended')
 
 # PART 4
 print('part 4 started')
-generate_json(input_video, cursor_filename, templateMouse_w, templateMouse_h, total_frames, fps, background_image,
+generate_json(input_video, cursor_filename, templateMouse_w, templateMouse_h,
+              total_frames, fps, background_image,
               json_cursor_log, json_operation_log)
 print('part 4 done')
