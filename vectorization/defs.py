@@ -9,6 +9,7 @@ import os
 from igraph import Graph
 from scipy import weave
 
+
 def get_color(image):
     # ignore black color and get the median of red, green and blue
     threshold_black = 10
@@ -175,67 +176,293 @@ def reduce_points(unreduced_list):
     return new_list
 
 
-def generate_json(input_video, cursor_filename, template_mouse_w, template_mouse_h, total_frames, fps,
-                  background_image, json_cursor_log, json_operation_log):
+def part_one(input_video, cursor_filename, background_image, count_objects_for_saving_images, json_operation_log,
+             json_cursor_log, template_mouse_w, template_mouse_h, total_frames, fps):
+    output_video = 'output.avi'
+    cap = cv2.VideoCapture(input_video)
+    image_width = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
+    image_height = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
+    fps = int(cap.get(cv2.cv.CV_CAP_PROP_FPS))
+    total_frames = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
+    template_mouse = cv2.imread(cursor_filename, 0)
+    template_mouse_w, template_mouse_h = template_mouse.shape[::-1]
+    fourcc = cv2.cv.CV_FOURCC(*'DIVX')
+    out = cv2.VideoWriter(output_video, fourcc, fps, (image_width, image_height))
+    threshold_mouse = 0
+    black_threshold = 24
+    last_value_frame = 0
+    is_user_writing = False
+    mouse_color_value = 0  # colored pixels in the cursor
+    threshold_drawing = 10  # extra colored pixels need in the next frame to qualify it as drawing
+    max_connect_frames = 3  # keep the drawing effect for next 5 frames, even if no drawing detected
+    current_connected_frame = max_connect_frames + 1
+    thresholdErasure = 50  # threshold to detect erasure operation
+    debug_miss_frames = 50
+    objects_drawn = 0
+    starting_frame = 0  # - base frame, initialized when user starts drawing
+    frame_before_starting_1 = 0
+    frame_before_starting_2 = 0
+    frame_before_starting_3 = 0
+    frame_before_starting_4 = 0
+    last_complete_image = 0
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    # placing rectangles
+    rect_start_x = []
+    rect_start_y = []
+    rect_width = []
+    rect_height = []
+    rect_time = []
 
-    # - Create a JSON File
-    j_filename = input_video
-    j_interpolation = "interpolation"
-    j_cursor_type = cursor_filename
-    j_cursor_offset = [str(int(template_mouse_w / 2)), str(int(template_mouse_h / 2))]
-    j_duration = str(total_frames / fps)
-    j_audio_file = "compressed_xyz.mp3"
-    j_background_image = background_image
-    j_frames_per_second = str(fps)
-    j_cursor = json_cursor_log
-    # - go one level deeper in operation
-    j_operations = []
+    f_write_objects = open('object_list.txt', 'w')
+    f_write_cursor_pos_for_order_points = open('cursor positions.txt', 'w')
+    f_write_cursor_general = open('cursor_general.txt', 'w')
+    cursor_pos_before_starting = []  # store as many as last 5 cursor positions
+    # this stores a copy of cursor_pos_before_starting and uses that to write to data
+    saved_copy_of_cursor_pos_before_starting = []
+    cursor_pos_for_ordering = []
+    # Create Folders if not exists
+    if not os.path.exists('objects'):
+        os.makedirs('objects')
+    if not os.path.exists('atomic objects'):
+        os.makedirs('atomic objects')
+    current_frame = 0
+    first_frame = 0
+    index_of_starting_frame = 0  # - used to get the starting timestamp
+    gray = []
+    current_mouse_position = (-1, -1)
+    while cap.isOpened():
+        ret, frame = cap.read()
 
-    for i in range(0, len(json_operation_log)):
+        if ret:
 
-        if i % 3 is 0:  # every third element
-            info = json_operation_log[i].split(" ")
-            info = map(float, info)
-            reduced_list = []
+            if current_frame == 0:
+                first_frame = frame
+                cv2.imwrite(background_image, first_frame)
 
-            for list_points in json_operation_log[i + 2]:
-                reduced_list = reduce_points(list_points)
+            else:
+                frame = cv2.subtract(frame, first_frame)
 
-            reduced_list = filter(None, reduced_list)
+            ''' Missing Frames
+            while (current_frame < debug_miss_frames):
+                ret, frame = cap.read()
+                current_frame += 1
+            '''
 
-            my_object = {
-                "offset_x": str(int(info[0])),
-                "offset_y": str(int(info[1])),
-                "start": str(info[2]),
-                "end": str(info[3]),
-                "color": [str(int(info[4])), str(int(info[5])), str(int(info[6]))],
-                "strokes": json_operation_log[i + 2]
-            }
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            j_operations.append(my_object)
+            if current_frame > 0:
 
-    json_object = {
-        "filename": j_filename,
-        "interpolation": j_interpolation,
-        "cursor_type": j_cursor_type,
-        "cursor_offset": j_cursor_offset,
-        "total_time": j_duration,
-        "audio_file": j_audio_file,
-        "background_image": j_background_image,
-        "frames_per_second": j_frames_per_second,
-        "cursor": j_cursor,
-        "operations": j_operations
-    }
+                current_mouse_position = get_current_mouse_location(gray, current_frame, template_mouse,
+                                                                    template_mouse_w, template_mouse_h, threshold_mouse)
 
-    json_data = json.dumps(json_object)
-    # - Write JSON to file
-    f_json = open('data.json', 'w')
-    f_json.write(json_data)
-    f_json.close()
+                f_write_cursor_general.write(
+                    str(current_mouse_position[1]) + " " + str(current_mouse_position[2]) + ",")
+                json_cursor_log.append([str(current_mouse_position[1]), str(current_mouse_position[2])])
+                # colored_pixels = countNonBackGroundPixels(gray, black_threshold, last_value_frame);
+                ret, binaryImage = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)
+                colored_pixels = cv2.countNonZero(binaryImage)
+                # print(colored_pixels)
+
+                if colored_pixels > mouse_color_value and colored_pixels - last_value_frame > threshold_drawing:
+                    current_connected_frame = 0
+
+                else:
+                    current_connected_frame += 1
+
+                _erasure = last_value_frame - colored_pixels
+
+                if _erasure > thresholdErasure:
+                    cv2.putText(frame, 'Pixels Removed: ' + str(_erasure), (5, 650), font, 1, (200, 50, 50), 1,
+                                cv2.CV_AA)
+
+                if (colored_pixels > mouse_color_value and colored_pixels - last_value_frame > threshold_drawing) or (
+                            current_connected_frame < max_connect_frames):
+
+                    # print("Drawing")
+                    # - If user just started drawing: initialize stuff
+                    if not is_user_writing:
+                        starting_frame = frame_before_starting_4  # 5 frames old
+                        index_of_starting_frame = current_frame
+                        # Reset Cursor Positions
+                        # - what about the last few cursor positions as well? if needed? - as in frame_before_starting
+                        # _4,5
+                        cursor_pos_for_ordering = []
+                        saved_copy_of_cursor_pos_before_starting = list(cursor_pos_before_starting)
+                        # - start saving the new object
+
+                    is_user_writing = True
+                    cv2.putText(frame, 'Writing', (5, 700), font, 1, (200, 50, 50), 1, cv2.CV_AA)
+                    # Add Cursor Positions to List
+                    cursor_pos_for_ordering.append(current_mouse_position)
+
+                else:
+
+                    # - If user just stopped: find out what user just drew
+                    if is_user_writing:
+                        # - Find the difference between current and starting frame
+                        # - Full Final Frame
+                        # cv2.imwrite('object ' + str(objects_drawn) + '.png', gray)
+                        # - Difference Frame
+                        # cv2.imwrite('object ' + str(objects_drawn) + ' diff.png', cv2.subtract(gray, starting_frame))
+                        # Get the new imge - update binary image
+                        bounding_image = cv2.subtract(gray, starting_frame)
+                        remove_cursor(bounding_image, template_mouse, template_mouse_w, template_mouse_h,
+                                      threshold_mouse)
+                        ret, binary_difference = cv2.threshold(bounding_image, 50, 255, cv2.THRESH_BINARY)
+                        # Erode to get rid of small white blocks
+                        kernel = np.ones((2, 2), np.uint8)
+                        binary_difference = cv2.erode(binary_difference, kernel, iterations=1)
+                        objects_drawn += 1
+                        # last_complete_image = frame
+                        contours, hierarchy = cv2.findContours(binary_difference, cv2.RETR_TREE,
+                                                               cv2.CHAIN_APPROX_SIMPLE)
+
+                        x1 = 1000  # - big value
+                        y1 = 1000  # - big value
+                        x2 = 0  # - small value
+                        y2 = 0  # - small value
+
+                        for i in range(0, len(contours)):
+
+                            x, y, w, h = cv2.boundingRect(contours[i])
+                            # cv2.rectangle(img,(x,y),(x + w,y + h),(255,0,0),1)
+                            if x < x1:
+                                x1 = x
+                            if y < y1:
+                                y1 = y
+                            if x + w > x2:
+                                x2 = x + w
+                            if y + h > y2:
+                                y2 = y + h
+
+                        # cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0),1)
+
+                        if x1 - 4 > 0 and x2 + 4 < image_width and y1 - 4 > 0 \
+                                and y2 + 4 < image_height and x2 - x1 > 0 and y2 - y1 > 0:
+
+                            rect_start_x.append(x1 - 4)
+                            rect_start_y.append(y1 - 4)
+                            rect_width.append(x2 + 4)
+                            rect_height.append(y2 + 4)
+
+                            _time = round(1.0 * current_frame / fps, 2)
+                            _starting_time = round(1.0 * index_of_starting_frame / fps, 2)
+                            # - to save the time when the first frame was registered
+                            rect_time.append(_time)
+                            ROI = frame[y1 - 4:y2 + 4, x1 - 4:x2 + 4]
+
+                            # Get Color of Object
+                            [r, g, b] = get_color(ROI)
+                            r = int(r)
+                            g = int(g)
+                            b = int(b)
+
+                            cv2.imwrite('objects/' + str(count_objects_for_saving_images) + '.png', ROI)
+                            count_objects_for_saving_images += 1
+                            f_write_objects.write(str(x1 - 4) + ' ' + str(y1 - 4) + ' ' + str(_starting_time) + ' ' +
+                                                  str(_time) + ' ' + str(r) + ' ' + str(g) + ' ' + str(b) + '\n')
+
+                            # Cursor positions before starting of the objects:
+                            # in order to get the very starting points that are missing otherwise
+                            for i in saved_copy_of_cursor_pos_before_starting:
+                                f_write_cursor_pos_for_order_points.write(str(i[0]) + " " + str(i[1] - (x1 - 4)) + " " +
+                                                                          str(i[2] - (y1 - 4)) + ' ')
+                                # print (str(i[0] - (x1 - 4)) + " " + str(i[1] - (y1 - 4)) + ' ')
+
+                            for i in cursor_pos_for_ordering:
+                                f_write_cursor_pos_for_order_points.write(str(i[0]) + " " + str(i[1] - (x1 - 4)) + " " +
+                                                                          str(i[2] - (y1 - 4)) + ' ')
+
+                            f_write_cursor_pos_for_order_points.write('\n')
+                            # Reset Cursor Positions
+                            cursor_pos_for_ordering = []
+
+                    # Reset to false
+                    cv2.putText(frame, 'Not Writing', (5, 700), font, 1, (50, 50, 200), 1, cv2.CV_AA)
+                    is_user_writing = False
+
+            if current_frame > 0:
+
+                last_value_frame = colored_pixels
+                frame_before_starting_4 = frame_before_starting_3
+                frame_before_starting_3 = frame_before_starting_2
+                frame_before_starting_2 = frame_before_starting_1
+                frame_before_starting_1 = gray
+
+                # Storing the last few (5) cursor locations,
+                # since we seem to miss that information when we realize that new object has started
+                if len(cursor_pos_before_starting) < 5:
+                    cursor_pos_before_starting.append(current_mouse_position)
+
+                else:
+                    cursor_pos_before_starting.pop(0)
+                    cursor_pos_before_starting.append(current_mouse_position)
+
+                # - Drawing rectangles
+                for i in range(0, len(rect_start_x)):
+                    _loc = 'x = ' + str(rect_start_x[i]) + ', y = ' + str(rect_start_y[i]) + ', '
+                    _size = 'width = ' + str(rect_width[i] - rect_start_x[i]) + ', height = ' \
+                            + str(rect_height[i] - rect_start_y[i]) + ', '
+                    _time = 'time: ' + str(rect_time[i])
+                    cv2.rectangle(frame, (rect_start_x[i], rect_start_y[i]), (rect_width[i], rect_height[i]),
+                                  (256, 0, 0), 2)
+                    cv2.putText(frame, _loc + _size + _time, (800, 20 + i * 13), font, 0.45, (50, 50, 200), 1,
+                                cv2.CV_AA)
+
+                final_frame = cv2.add(frame, first_frame)
+                out.write(final_frame)
+                # cv2.imshow('frame',gray)
+
+            current_frame += 1
+            # print current_frame
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+        else:
+            break
+
+    f_write_objects.close()
+    f_write_cursor_pos_for_order_points.close()
+    f_write_cursor_general.close()
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
+
+    return (count_objects_for_saving_images, json_operation_log, json_cursor_log, template_mouse_w, template_mouse_h,
+            total_frames, fps)
+
+
+def part_two(count_objects_for_saving_images):
+    # Get total_objects from last part
+    total_objects = count_objects_for_saving_images
+    for object_number in range(0, total_objects):
+
+        image = cv2.imread('objects/' + str(object_number) + '.png')
+        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        binary_threshold = 50
+        ret, bw_image = cv2.threshold(gray_image, binary_threshold, 255, 0)
+        contour_image = copy.deepcopy(bw_image)
+        contours, hierarchy = cv2.findContours(contour_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        # cv2.drawContours(image,contours,-1,(0,255,0),3)
+
+        for i in range(0, len(contours)):
+            x, y, w, h = cv2.boundingRect(contours[i])
+            # cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),1)
+            # cv2.imshow(str(i), image)
+            mask = np.zeros(image.shape, np.uint8)
+            mask[y:y + h, x:x + w] = image[y:y + h, x:x + w]
+            cv2.imwrite('atomic objects/' + str(object_number) + '_' + str(i) + '.png', mask)
+            # cv2.imshow(str(i), mask);
+            # print 'here'
+
+    # color_img = cv2.cvtColor(bw_image, cv2.COLOR_GRAY2BGR)
+    # enlarge = cv2.resize(image, (0,0), fx=4, fy=4)
+    # cv2.imshow("image", enlarge);
+    # cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 def part_three(total_objects, json_operation_log):
-
     # Read Cursor positions
     f = open('cursor positions.txt')
     data = f.read().split('\n')
@@ -357,7 +584,7 @@ def part_three(total_objects, json_operation_log):
                 else:
 
                     # Path exists
-                    _path_between_strokes = []
+                    path_between_strokes = []
 
                     for _path_points in shortest_path[0]:
                         # shortest path contains an array of shortest paths, meaning there could be more than one,
@@ -365,12 +592,12 @@ def part_three(total_objects, json_operation_log):
                         # color_img[g.vs[_path_points]['point']] = [0,0,0]
                         path_points.append(g.vs[_path_points]['point'])
                         # Save path points so that we can delete them later on
-                        _path_between_strokes.append(g.vs[_path_points]['point'])
+                        path_between_strokes.append(g.vs[_path_points]['point'])
                         # print 'start: ' + str(start_vertex['point'])
                         # print 'end: ' + str(end_vertex['point'])
                         # print 'path: ' + str(path_points)
 
-                    path_points_ordered.append(_path_between_strokes)
+                    path_points_ordered.append(path_between_strokes)
 
             # 1st pass:
             # Remove all points used in any path - except data points
@@ -543,284 +770,59 @@ def part_three(total_objects, json_operation_log):
     cv2.destroyAllWindows()
 
 
-def part_two(count_objects_for_saving_images):
-    # Get total_objects from last part
-    total_objects = count_objects_for_saving_images
-    for object_number in range(0, total_objects):
+def generate_json(input_video, cursor_filename, template_mouse_w, template_mouse_h, total_frames, fps,
+                  background_image, json_cursor_log, json_operation_log):
+    # - Create a JSON File
+    j_filename = input_video
+    j_interpolation = "interpolation"
+    j_cursor_type = cursor_filename
+    j_cursor_offset = [str(int(template_mouse_w / 2)), str(int(template_mouse_h / 2))]
+    j_duration = str(total_frames / fps)
+    j_audio_file = "compressed_xyz.mp3"
+    j_background_image = background_image
+    j_frames_per_second = str(fps)
+    j_cursor = json_cursor_log
+    # - go one level deeper in operation
+    j_operations = []
 
-        image = cv2.imread('objects/' + str(object_number) + '.png')
-        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        binary_threshold = 50
-        ret, bw_image = cv2.threshold(gray_image, binary_threshold, 255, 0)
-        contour_image = copy.deepcopy(bw_image)
-        contours, hierarchy = cv2.findContours(contour_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        # cv2.drawContours(image,contours,-1,(0,255,0),3)
+    for i in range(0, len(json_operation_log)):
 
-        for i in range(0, len(contours)):
-            x, y, w, h = cv2.boundingRect(contours[i])
-            # cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),1)
-            # cv2.imshow(str(i), image)
-            mask = np.zeros(image.shape, np.uint8)
-            mask[y:y + h, x:x + w] = image[y:y + h, x:x + w]
-            cv2.imwrite('atomic objects/' + str(object_number) + '_' + str(i) + '.png', mask)
-            # cv2.imshow(str(i), mask);
-            # print 'here'
+        if i % 3 is 0:  # every third element
+            info = json_operation_log[i].split(" ")
+            info = map(float, info)
+            reduced_list = []
 
-    # color_img = cv2.cvtColor(bw_image, cv2.COLOR_GRAY2BGR)
-    # enlarge = cv2.resize(image, (0,0), fx=4, fy=4)
-    # cv2.imshow("image", enlarge);
-    # cv2.waitKey(0)
-    cv2.destroyAllWindows()
+            for list_points in json_operation_log[i + 2]:
+                reduced_list = reduce_points(list_points)
 
+            reduced_list = filter(None, reduced_list)
 
-def part_one(input_video, cursor_filename, background_image, count_objects_for_saving_images, json_operation_log,
-             json_cursor_log, templateMouse_w, templateMouse_h, TotalFrames, FPS):
+            my_object = {
+                "offset_x": str(int(info[0])),
+                "offset_y": str(int(info[1])),
+                "start": str(info[2]),
+                "end": str(info[3]),
+                "color": [str(int(info[4])), str(int(info[5])), str(int(info[6]))],
+                "strokes": json_operation_log[i + 2]
+            }
 
-    output_video = 'output.avi'
-    cap = cv2.VideoCapture(input_video)
-    imageWidth = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
-    imageHeight = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
-    FPS = int(cap.get(cv2.cv.CV_CAP_PROP_FPS))
-    TotalFrames = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
-    templateMouse = cv2.imread(cursor_filename, 0)
-    templateMouse_w, templateMouse_h = templateMouse.shape[::-1]
-    fourcc = cv2.cv.CV_FOURCC(*'DIVX')
-    out = cv2.VideoWriter(output_video, fourcc, FPS, (imageWidth, imageHeight))
-    thresholdMouse = 0
-    BlackThreshold = 24
-    LastValueFrame = 0
-    is_user_writing = False
-    MouseColorValue = 0  # colored pixels in the cursor
-    ThresholdDrawing = 10  # extra colored pixels need in the next frame to qualify it as drawing
-    MaxConnectFrames = 3  # keep the drawing effect for next 5 frames, even if no drawing detected
-    current_connected_frame = MaxConnectFrames + 1
-    thresholdErasure = 50  # threshold to detect erasure operation
-    _debug_MissFrames = 50
-    ObjectsDrawn = 0
-    StartingFrame = 0  # - base frame, initialized when user starts drawing
-    frame_before_starting_1 = 0
-    frame_before_starting_2 = 0
-    frame_before_starting_3 = 0
-    frame_before_starting_4 = 0
-    LastCompleteImage = 0
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    # placing rectangles
-    rect_start_x = []
-    rect_start_y = []
-    rect_width = []
-    rect_height = []
-    rect_time = []
+            j_operations.append(my_object)
 
-    f_write_objects = open('object_list.txt', 'w')
-    f_write_cursor_pos_for_order_points = open('cursor positions.txt', 'w')
-    f_write_cursor_general = open('cursor_general.txt', 'w')
-    cursor_pos_before_starting = []  # store as many as last 5 cursor positions
-    # this stores a copy of cursor_pos_before_starting and uses that to write to data
-    saved_copy_of_cursor_pos_before_starting = []
-    cursor_pos_for_ordering = []
-    # Create Folders if not exists
-    if not os.path.exists('objects'):
-        os.makedirs('objects')
-    if not os.path.exists('atomic objects'):
-        os.makedirs('atomic objects')
-    current_frame = 0
-    first_frame = 0
-    index_of_starting_frame = 0  # - used to get the starting timestamp
-    gray = []
-    current_mouse_position = (-1, -1)
-    while cap.isOpened():
-        ret, frame = cap.read()
+    json_object = {
+        "filename": j_filename,
+        "interpolation": j_interpolation,
+        "cursor_type": j_cursor_type,
+        "cursor_offset": j_cursor_offset,
+        "total_time": j_duration,
+        "audio_file": j_audio_file,
+        "background_image": j_background_image,
+        "frames_per_second": j_frames_per_second,
+        "cursor": j_cursor,
+        "operations": j_operations
+    }
 
-        if ret:
-
-            if current_frame == 0:
-                first_frame = frame
-                cv2.imwrite(background_image, first_frame)
-
-            else:
-                frame = cv2.subtract(frame, first_frame)
-
-            ''' Missing Frames
-            while (current_frame < _debug_MissFrames):
-                ret, frame = cap.read()
-                current_frame += 1
-            '''
-
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-            if current_frame > 0:
-
-                current_mouse_position = get_current_mouse_location(gray, current_frame, templateMouse, templateMouse_w,
-                                                                    templateMouse_h, thresholdMouse)
-
-                f_write_cursor_general.write(
-                    str(current_mouse_position[1]) + " " + str(current_mouse_position[2]) + ",")
-                json_cursor_log.append([str(current_mouse_position[1]), str(current_mouse_position[2])])
-                # colored_pixels = countNonBackGroundPixels(gray, BlackThreshold, LastValueFrame);
-                ret, binaryImage = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)
-                colored_pixels = cv2.countNonZero(binaryImage)
-                # print(colored_pixels)
-
-                if colored_pixels > MouseColorValue and colored_pixels - LastValueFrame > ThresholdDrawing:
-                    current_connected_frame = 0
-
-                else:
-                    current_connected_frame += 1
-
-                _erasure = LastValueFrame - colored_pixels
-
-                if _erasure > thresholdErasure:
-                    cv2.putText(frame, 'Pixels Removed: ' + str(_erasure), (5, 650), font, 1, (200, 50, 50), 1,
-                                cv2.CV_AA)
-
-                if (colored_pixels > MouseColorValue and colored_pixels - LastValueFrame > ThresholdDrawing) or (
-                            current_connected_frame < MaxConnectFrames):
-
-                    # print("Drawing")
-                    # - If user just started drawing: initialize stuff
-                    if not is_user_writing:
-                        StartingFrame = frame_before_starting_4  # 5 frames old
-                        index_of_starting_frame = current_frame
-                        # Reset Cursor Positions
-                        # - what about the last few cursor positions as well? if needed? - as in frame_before_starting
-                        # _4,5
-                        cursor_pos_for_ordering = []
-                        saved_copy_of_cursor_pos_before_starting = list(cursor_pos_before_starting)
-                        # - start saving the new object
-
-                    is_user_writing = True
-                    cv2.putText(frame, 'Writing', (5, 700), font, 1, (200, 50, 50), 1, cv2.CV_AA)
-                    # Add Cursor Positions to List
-                    cursor_pos_for_ordering.append(current_mouse_position)
-
-                else:
-
-                    # - If user just stopped: find out what user just drew
-                    if is_user_writing:
-                        # - Find the difference between current and starting frame
-                        # - Full Final Frame
-                        # cv2.imwrite('object ' + str(ObjectsDrawn) + '.png', gray)
-                        # - Difference Frame
-                        # cv2.imwrite('object ' + str(ObjectsDrawn) + ' diff.png', cv2.subtract(gray, StartingFrame))
-                        # Get the new imge - update binary image
-                        bounding_image = cv2.subtract(gray, StartingFrame)
-                        remove_cursor(bounding_image, templateMouse, templateMouse_w, templateMouse_h, thresholdMouse)
-                        ret, binaryDifference = cv2.threshold(bounding_image, 50, 255, cv2.THRESH_BINARY)
-                        # Erode to get rid of small white blocks
-                        kernel = np.ones((2, 2), np.uint8)
-                        binaryDifference = cv2.erode(binaryDifference, kernel, iterations=1)
-                        ObjectsDrawn += 1
-                        # LastCompleteImage = frame
-                        contours, hierarchy = cv2.findContours(binaryDifference, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-                        x1 = 1000  # - big value
-                        y1 = 1000  # - big value
-                        x2 = 0  # - small value
-                        y2 = 0  # - small value
-
-                        for i in range(0, len(contours)):
-
-                            x, y, w, h = cv2.boundingRect(contours[i])
-                            # cv2.rectangle(img,(x,y),(x + w,y + h),(255,0,0),1)
-                            if x < x1:
-                                x1 = x
-                            if y < y1:
-                                y1 = y
-                            if x + w > x2:
-                                x2 = x + w
-                            if y + h > y2:
-                                y2 = y + h
-
-                        # cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0),1)
-
-                        if x1 - 4 > 0 and x2 + 4 < imageWidth and y1 - 4 > 0 \
-                                and y2 + 4 < imageHeight and x2 - x1 > 0 and y2 - y1 > 0:
-
-                            rect_start_x.append(x1 - 4)
-                            rect_start_y.append(y1 - 4)
-                            rect_width.append(x2 + 4)
-                            rect_height.append(y2 + 4)
-
-                            _time = round(1.0 * current_frame / FPS, 2)
-                            _starting_time = round(1.0 * index_of_starting_frame / FPS, 2)
-                            # - to save the time when the first frame was registered
-                            rect_time.append(_time)
-                            ROI = frame[y1 - 4:y2 + 4, x1 - 4:x2 + 4]
-
-                            # Get Color of Object
-                            [r, g, b] = get_color(ROI)
-                            r = int(r)
-                            g = int(g)
-                            b = int(b)
-
-                            cv2.imwrite('objects/' + str(count_objects_for_saving_images) + '.png', ROI)
-                            count_objects_for_saving_images += 1
-                            f_write_objects.write(str(x1 - 4) + ' ' + str(y1 - 4) + ' ' + str(_starting_time) + ' ' +
-                                                  str(_time) + ' ' + str(r) + ' ' + str(g) + ' ' + str(b) + '\n')
-
-                            # Cursor positions before starting of the objects:
-                            # in order to get the very starting points that are missing otherwise
-                            for i in saved_copy_of_cursor_pos_before_starting:
-                                f_write_cursor_pos_for_order_points.write(str(i[0]) + " " + str(i[1] - (x1 - 4)) + " " +
-                                                                          str(i[2] - (y1 - 4)) + ' ')
-                                # print (str(i[0] - (x1 - 4)) + " " + str(i[1] - (y1 - 4)) + ' ')
-
-                            for i in cursor_pos_for_ordering:
-                                f_write_cursor_pos_for_order_points.write(str(i[0]) + " " + str(i[1] - (x1 - 4)) + " " +
-                                                                          str(i[2] - (y1 - 4)) + ' ')
-
-                            f_write_cursor_pos_for_order_points.write('\n')
-                            # Reset Cursor Positions
-                            cursor_pos_for_ordering = []
-
-                    # Reset to false
-                    cv2.putText(frame, 'Not Writing', (5, 700), font, 1, (50, 50, 200), 1, cv2.CV_AA)
-                    is_user_writing = False
-
-            if current_frame > 0:
-
-                LastValueFrame = colored_pixels
-                frame_before_starting_4 = frame_before_starting_3
-                frame_before_starting_3 = frame_before_starting_2
-                frame_before_starting_2 = frame_before_starting_1
-                frame_before_starting_1 = gray
-
-                # Storing the last few (5) cursor locations,
-                # since we seem to miss that information when we realize that new object has started
-                if len(cursor_pos_before_starting) < 5:
-                    cursor_pos_before_starting.append(current_mouse_position)
-
-                else:
-                    cursor_pos_before_starting.pop(0)
-                    cursor_pos_before_starting.append(current_mouse_position)
-
-                # - Drawing rectangles
-                for i in range(0, len(rect_start_x)):
-                    _loc = 'x = ' + str(rect_start_x[i]) + ', y = ' + str(rect_start_y[i]) + ', '
-                    _size = 'width = ' + str(rect_width[i] - rect_start_x[i]) + ', height = ' \
-                            + str(rect_height[i] - rect_start_y[i]) + ', '
-                    _time = 'time: ' + str(rect_time[i])
-                    cv2.rectangle(frame, (rect_start_x[i], rect_start_y[i]), (rect_width[i], rect_height[i]),
-                                  (256, 0, 0), 2)
-                    cv2.putText(frame, _loc + _size + _time, (800, 20 + i * 13), font, 0.45, (50, 50, 200), 1,
-                                cv2.CV_AA)
-
-                final_frame = cv2.add(frame, first_frame)
-                out.write(final_frame)
-                # cv2.imshow('frame',gray)
-
-            current_frame += 1
-            # print current_frame
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-        else:
-            break
-    f_write_objects.close()
-    f_write_cursor_pos_for_order_points.close()
-    f_write_cursor_general.close()
-    cap.release()
-    out.release()
-    cv2.destroyAllWindows()
-
-    return (count_objects_for_saving_images, json_operation_log, json_cursor_log, templateMouse_w, templateMouse_h, TotalFrames, FPS)
+    json_data = json.dumps(json_object)
+    # - Write JSON to file
+    f_json = open('data.json', 'w')
+    f_json.write(json_data)
+    f_json.close()
