@@ -209,7 +209,7 @@ def generate_json(input_video, cursor_filename, template_mouse_w, template_mouse
                 "start": str(info[2]),
                 "end": str(info[3]),
                 "color": [str(int(info[4])), str(int(info[5])), str(int(info[6]))],
-                "strokes": reduced_list
+                "strokes": json_operation_log[i + 2]
             }
 
             j_operations.append(my_object)
@@ -229,7 +229,7 @@ def generate_json(input_video, cursor_filename, template_mouse_w, template_mouse
 
     json_data = json.dumps(json_object)
     # - Write JSON to file
-    f_json = open('json.txt', 'w')
+    f_json = open('data.json', 'w')
     f_json.write(json_data)
     f_json.close()
 

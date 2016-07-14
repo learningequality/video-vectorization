@@ -467,8 +467,8 @@ function set_audio_volume(val) {
 
 /********************CANVAS********************/
 
-function load_json(){
-    $.get('./source/data.json', function (data) {
+function load_json() {
+    $.get('../vectorization/data.json', function (data) {
         init_canvas(data);
     });
 }
@@ -480,7 +480,7 @@ function init_canvas(data) {
 
     json_data = data;
     modify_json();
-    //console.log( json_data);
+    console.log(json_data);
 
     paper_scope.setup($(".vector_canvas")[0]);
     paper_scope.view.onFrame = check_if_playing;
@@ -734,22 +734,25 @@ function render_canvas() {
  */
 function render_cursor(width_adjust, height_adjust) {
     var cursor_index = parseInt(( latest_time / parseFloat(json_data.total_time)) * json_data.cursor.length);
-    var cursor_x = (parseInt(json_data.cursor[cursor_index][0])) * width_adjust;
-    var cursor_y = (parseInt(json_data.cursor[cursor_index][1])) * height_adjust;
 
-    if (cursor) {
-        cursor.position = new paper_scope.Point(cursor_x, cursor_y);
-        if (zoom_enabled) {
-            paper_scope.view.center = new paper_scope.Point(adjust_center_x(cursor_x), adjust_center_y(cursor_y));
-        }
-    } else {
-        cursor = new paper_scope.Path.Circle(
-            {
-                center: new paper_scope.Point(cursor_x, cursor_y),
-                radius: 2,
-                fillColor: 'white'
+    if (cursor_index < json_data.cursor.length) {
+        var cursor_x = (parseInt(json_data.cursor[cursor_index][0])) * width_adjust;
+        var cursor_y = (parseInt(json_data.cursor[cursor_index][1])) * height_adjust;
+
+        if (cursor) {
+            cursor.position = new paper_scope.Point(cursor_x, cursor_y);
+            if (zoom_enabled) {
+                paper_scope.view.center = new paper_scope.Point(adjust_center_x(cursor_x), adjust_center_y(cursor_y));
             }
-        );
+        } else {
+            cursor = new paper_scope.Path.Circle(
+                {
+                    center: new paper_scope.Point(cursor_x, cursor_y),
+                    radius: 2,
+                    fillColor: 'white'
+                }
+            );
+        }
     }
 }
 

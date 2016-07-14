@@ -52,8 +52,7 @@ fabric.properties
 /vectorization/complete_strokes.txt
 /vectorization/cursor positions.txt
 /vectorization/cursor_general.txt
-/vectorization/json.txt
 /vectorization/object_list.txt
 /vectorization/output.avi
 /vectorization/objects/
-/vectorization/test.txt
+/vectorization/data.json
