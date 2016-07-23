@@ -9,6 +9,7 @@
 ### Basic Dependencies.
 * Python 2.7
 * pip
+* ffmpeg
 
 ### Install drivers.
 * Add NVIDIA drivers PPA `sudo add-apt-repository ppa:graphics-drivers/ppa` and install the appropriate one, currently version 367.27.
