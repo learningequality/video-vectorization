@@ -1,5 +1,6 @@
 .vector_wrapper {
     position: relative;
+    max-width: 90vh;
 }
 
 .vector_canvas_wrapper {
