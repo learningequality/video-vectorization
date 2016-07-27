@@ -272,6 +272,8 @@ function init_vars() {
     voice_volume = 1;
     voice_queue = [];
     voice_lang = null;
+    
+    play_back_rate = 1.0;
 }
 
 
