@@ -1,6 +1,5 @@
 /*!
- * Vectorized Video Renderer 0.0.1
- *
+ * Vector Video Player 0.0.1
  */
 
 /********************INIT & EVENT LISTENERS********************/
