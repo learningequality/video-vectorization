@@ -1,5 +1,19 @@
 # Video Vectorization
 
+## Motivation
+
+* Huge space/bandwiths savings, 250x or better.
+* Support small screens using adaptive zoom.
+* Can be authored, edited, and localized using low-powered devices, with no loss of quality and no need for encoding video.
+
+# Parts
+
+This project consists of 3 parts.
+
+1. **Vectorization** - Vectorize currently existing blackboard style educational videos.
+2. **Rendering** - Vector Video Player that renders the vector video format within a broswer.
+3. **Authoring** - Allow authoring, editing, and localizing vector videos within a browser.
+
 ## Running Vectorization Side
 
 ### Setup
