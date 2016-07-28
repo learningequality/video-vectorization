@@ -19,16 +19,16 @@ $(document).ready(function () {
     $(".vector_settings_btn").bind("click", function () {
         clicked_settings_btn();
     });
-    $(".vector_playback_rate_item").bind("click", function () {
+    $(".vector_playback_rate_item").bind("click", function (event) {
         clicked_playback_rate_item(event);
     });
-    $(".vector_zoom_level_item").bind("click", function () {
+    $(".vector_zoom_level_item").bind("click", function (event) {
         clicked_zoom_level_item(event);
     });
-    $(".vector_cc_menu_item").bind("click", function () {
+    $(".vector_cc_menu_item").bind("click", function (event) {
         clicked_cc_menu_item(event);
     });
-    $(".vector_voice_menu_item").bind("click", function () {
+    $(".vector_voice_menu_item").bind("click", function (event) {
         clicked_voice_menu_item(event);
     });
     $(".vector_volume_btn").bind("click", function () {
