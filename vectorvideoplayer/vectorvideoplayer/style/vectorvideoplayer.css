@@ -1,6 +1,9 @@
+.limit_width {
+    max-width: 1200px;
+}
+
 .vector_wrapper {
     position: relative;
-    max-width: 90vh;
 }
 
 .vector_canvas_wrapper {
@@ -56,82 +59,82 @@
 }
 
 .vector_play_pause_btn {
-    background: url(vectorvideo_icons/ic_play_arrow_white_24px.svg) no-repeat center;
+    background: url(icons/ic_play_arrow_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_play_pause_btn_pause {
-    background: url(vectorvideo_icons/ic_pause_white_24px.svg) no-repeat center;
+    background: url(icons/ic_pause_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_replay_btn {
-    background: url(vectorvideo_icons/ic_replay_10_white_24px.svg) no-repeat center;
+    background: url(icons/ic_replay_10_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_full_screen_btn {
-    background: url(vectorvideo_icons/ic_fullscreen_white_24px.svg) no-repeat center;
+    background: url(icons/ic_fullscreen_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_full_screen_btn_on {
-    background: url(vectorvideo_icons/ic_fullscreen_exit_white_24px.svg) no-repeat center;
+    background: url(icons/ic_fullscreen_exit_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_playback_rate_btn {
-    background: url(vectorvideo_icons/ic_av_timer_white_24px.svg) no-repeat center;
+    background: url(icons/ic_av_timer_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_playback_rate_btn_on {
-    background: url(vectorvideo_icons/ic_av_timer_color_24px.svg) no-repeat center;
+    background: url(icons/ic_av_timer_color_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_zoom_level_btn {
-    background: url(vectorvideo_icons/ic_zoom_in_white_24px.svg) no-repeat center;
+    background: url(icons/ic_zoom_in_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_zoom_level_btn_on {
-    background: url(vectorvideo_icons/ic_zoom_out_white_24px.svg) no-repeat center;
+    background: url(icons/ic_zoom_out_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_cc_btn {
-    background: url(vectorvideo_icons/ic_closed_caption_white_24px.svg) no-repeat center;
+    background: url(icons/ic_closed_caption_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_cc_btn_on {
-    background: url(vectorvideo_icons/ic_closed_caption_color_24px.svg) no-repeat center;
+    background: url(icons/ic_closed_caption_color_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_voice_btn {
-    background: url(vectorvideo_icons/ic_record_voice_over_white_24px.svg) no-repeat center;
+    background: url(icons/ic_record_voice_over_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_voice_btn_on {
-    background: url(vectorvideo_icons/ic_record_voice_over_color_24px.svg) no-repeat center;
+    background: url(icons/ic_record_voice_over_color_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_volume_btn {
-    background: url(vectorvideo_icons/ic_volume_up_white_24px.svg) no-repeat center;
+    background: url(icons/ic_volume_up_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_volume_btn_mute {
-    background: url(vectorvideo_icons/ic_volume_off_white_24px.svg) no-repeat center;
+    background: url(icons/ic_volume_off_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 
 .vector_settings_btn {
-    background: url(vectorvideo_icons/ic_settings_white_24px.svg) no-repeat center;
+    background: url(icons/ic_settings_white_24px.svg) no-repeat center;
     background-size: contain;
     position: absolute;
     right: 0;
@@ -139,7 +142,7 @@
 }
 
 .vector_settings_btn_exit {
-    background: url(vectorvideo_icons/ic_close_white_24px.svg) no-repeat center;
+    background: url(icons/ic_close_white_24px.svg) no-repeat center;
     background-size: contain;
 }
 

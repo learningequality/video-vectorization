@@ -125,7 +125,7 @@ function clicked_cc_menu_item(e) {
         cc_on = true;
         $('.vector_cc_btn').addClass('vector_cc_btn_on');
 
-        var cc_vtt_file = "source/vtt/" + cc_lang + ".vtt";
+        var cc_vtt_file = "data/vtt/" + cc_lang + ".vtt";
         $.get(cc_vtt_file, function (vtt_file) {
             that.parse_captions(vtt_file, "cc");
         });
@@ -159,7 +159,7 @@ function clicked_voice_menu_item(e) {
 
             $('.vector_voice_btn').addClass('vector_voice_btn_on');
 
-            var voice_vtt_file = "source/vtt/" + voice_lang + ".vtt";
+            var voice_vtt_file = "data/vtt/" + voice_lang + ".vtt";
             $.get(voice_vtt_file, function (vtt_file) {
                 that.parse_captions(vtt_file, "voice");
             });
@@ -272,7 +272,7 @@ function init_vars() {
     voice_volume = 1;
     voice_queue = [];
     voice_lang = null;
-    
+
     play_back_rate = 1.0;
 }
 
@@ -315,7 +315,7 @@ function init_sound_manager() {
  */
 function init_audio_object() {
     window.audio_object = audio_object = soundManager.createSound({
-        url: './source/audio.mp3',
+        url: './data/audio.mp3',
         onload: audio_loaded.bind(this),
         onplay: audio_played.bind(this),
         onpause: audio_paused.bind(this),
@@ -557,7 +557,7 @@ function reset_canvas_center() {
 function add_bg() {
     var that = this;
     var bg_img = new paper_scope.Raster({
-        source: './source/background.png'
+        source: './data/img/background.png'
     });
 
     bg_img.onLoad = function () {
