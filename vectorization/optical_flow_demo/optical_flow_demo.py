@@ -66,9 +66,9 @@ if __name__ == '__main__':
     image_width = int(cam.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
     image_height = int(cam.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
     fps = int(cam.get(cv2.cv.CV_CAP_PROP_FPS))
-    out_flow = cv2.VideoWriter('demo_flow.avi', cv2.cv.CV_FOURCC(*'DIVX'), fps,
+    out_flow = cv2.VideoWriter('flow.avi', cv2.cv.CV_FOURCC(*'DIVX'), fps,
                                (image_width, image_height))
-    out_hsv = cv2.VideoWriter('demo_hsv.avi', cv2.cv.CV_FOURCC(*'DIVX'), fps,
+    out_hsv = cv2.VideoWriter('hsv.avi', cv2.cv.CV_FOURCC(*'DIVX'), fps,
                               (image_width, image_height))
 
     while True:

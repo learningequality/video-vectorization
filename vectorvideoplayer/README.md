@@ -1,1 +1,1 @@
-[View demo.](https://rawgit.com/christianmemije/videovectorization/master/vectorvideoplayer/index.html)
+[View demo.](https://rawgit.com/learningequality/video-vectorization/master/vectorvideoplayer/index.html)
