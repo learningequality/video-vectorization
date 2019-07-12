@@ -1,3 +1,4 @@
+# Copyright 2019 Google LLC.
 """Identifies objects in the foreground of a video.
 
 Adds a stream containing coordinates of bounding boxes for non-stroke objects in

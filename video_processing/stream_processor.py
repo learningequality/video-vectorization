@@ -1,3 +1,4 @@
+# Copyright 2019 Google LLC.
 """Base stream processor and associated support.
 
 Base class for video processing modules. Modules can be strung together into

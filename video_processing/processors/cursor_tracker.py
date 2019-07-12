@@ -1,3 +1,4 @@
+# Copyright 2019 Google LLC.
 """Tracks the cursor in a video.
 
 Given a template image for a cursor, adds a stream containing coordinates of the

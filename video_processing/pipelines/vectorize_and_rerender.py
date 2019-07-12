@@ -1,3 +1,4 @@
+# Copyright 2019 Google LLC.
 """Pipeline to vectorize a video and then render the vectorized format.
 
 Used for testing.

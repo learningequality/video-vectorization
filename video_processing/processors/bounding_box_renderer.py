@@ -1,7 +1,5 @@
-"""Renders bounding boxes on a video stream.
-
-
-"""
+# Copyright 2019 Google LLC.
+"""Renders bounding boxes on a video stream."""
 
 from __future__ import absolute_import
 from __future__ import division

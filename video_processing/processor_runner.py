@@ -1,3 +1,4 @@
+# Copyright 2019 Google LLC.
 """Utility function for running a chain of processors."""
 
 from __future__ import absolute_import

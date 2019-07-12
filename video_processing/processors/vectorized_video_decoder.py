@@ -1,3 +1,4 @@
+# Copyright 2019 Google LLC.
 """Video decoder that renders a vectorized JSON file to video frames.
 
 Internally, this class brings up an HTTP server in a separate thread to serve

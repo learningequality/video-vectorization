@@ -1,3 +1,4 @@
+# Copyright 2019 Google LLC.
 """Pipeline to decode and reencode a video using OpenCV."""
 from absl import app
 from absl import flags

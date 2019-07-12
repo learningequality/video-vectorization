@@ -1,3 +1,4 @@
+# Copyright 2019 Google LLC.
 """Pipeline to track objects and render their bounding boxes."""
 from absl import app
 from absl import flags

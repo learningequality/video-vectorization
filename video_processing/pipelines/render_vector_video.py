@@ -1,3 +1,4 @@
+# Copyright 2019 Google LLC.
 """Renders a vectorized video to a video file."""
 
 from absl import app

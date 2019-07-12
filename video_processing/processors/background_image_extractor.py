@@ -1,4 +1,4 @@
-# Lint as: python2, python3
+# Copyright 2019 Google LLC.
 """Creates a new stream containing a background image for a video stream.
 
 The implementation is currently very naive. It simply takes the first frame of a
