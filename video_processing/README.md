@@ -3,7 +3,7 @@
 A simple framework for processing video files using units called processors
 that operate on streams of video frames and other objects.
 
-##Setup on mac
+## Setup on mac
 Minimal footprint at the system level by using virtualenv.
 ```sh
 sudo easy_install pip
