@@ -6,7 +6,7 @@ cycler==0.10.0
 dask==0.10.1
 decorator==4.0.10
 docutils==0.12
-ipython==5.0.0
+ipython==7.16.3
 ipython-genutils==0.1.0
 lockfile==0.12.2
 luigi==2.2.0
